@@ -24,26 +24,8 @@ import gdown
 import os
 
 MODEL_PATH = "cnn_model.pth"
-DATA_ZIP = "train.zip"
-DATA_DIR = "train/"
+DATA_DIR = "C:/Users/raitovn/OneDrive - Rose-Hulman Institute of Technology/School/Nature-Noises-Classifier/train_2/"
 
-if not os.path.exists(DATA_DIR):
-    with st.spinner("📦 Downloading dataset from Google Drive..."):
-        gdown.download(
-            "https://drive.google.com/uc?id=1cN_AlzimWSaxsvRA8GFzWXk3vfZBJu83", 
-            DATA_ZIP,
-            quiet=False
-        )
-        with zipfile.ZipFile(DATA_ZIP, 'r') as zip_ref:
-            zip_ref.extractall(DATA_DIR)
-
-if not os.path.exists(MODEL_PATH):
-    with st.spinner("🤖 Downloading model from Google Drive..."):
-        gdown.download(
-            "https://drive.google.com/uc?id=1cik1DYKdagjUv0Jl42UrED3BMv13PFgz", 
-            MODEL_PATH,
-            quiet=False
-        )
 VALID_PATH = "data/label_metadata/train_tiny_id_to_valid.json" 
 LABEL_DIR = "data/label_metadata/id_to_species.json"
 
@@ -121,15 +103,31 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+our_species = ['Pseudacris crucifer',
+ 'Cardinalis cardinalis',
+ 'Cyanocitta cristata',
+ 'Fringilla coelebs',
+ 'Agelaius phoeniceus',
+ 'Erithacus rubecula',
+ 'Parus major',
+ 'Poecile atricapillus',
+ 'Melospiza melodia',
+ 'Passer domesticus',
+ 'Phylloscopus collybita',
+ 'Sylvia atricapilla',
+ 'Thryothorus ludovicianus',
+ 'Troglodytes aedon',
+ 'Turdus merula',
+ 'Turdus migratorius',
+ 'Turdus philomelos',
+ 'Vireo olivaceus']
 
 # Classes
 with open(VALID_PATH, "r") as f:
     valid_info = json.load(f)  
 valid_info = [v.lower() == true if isinstance(v, str) else v for v in valid_info]
-with open(LABEL_DIR, "r") as f:
-    id_to_species = json.load(f)
-
-valid_classes = list(range(len(id_to_species)))
+valid_classes = sorted([c for c in os.listdir(DATA_DIR) if os.path.isdir(os.path.join(DATA_DIR, c))])
+classes = valid_classes
 
 # Select Input Source
 st.write("#### Choose Input Source")
@@ -140,7 +138,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # If dataset mode
 if input_mode == "From Dataset":
     selected_class = st.selectbox("**Choose a Class to Explore:**", options=valid_classes, index=0)
-    class_path = os.path.join(DATA_DIR, selected_class)
+    class_path = os.path.join(DATA_DIR, str(selected_class))
     audio_files = [f for f in os.listdir(class_path) if f.endswith((".wav", ".mp3"))]
 
     if not audio_files:
@@ -153,12 +151,6 @@ if input_mode == "From Dataset":
 
 # If upload mode
 else:
-    # add a dropdown of existing classes for user reference
-    our_species = []
-    for i in range(len(valid_classes)):
-        idx = classes.index(valid_classes[i])
-        our_species.append(id_to_species[idx])
-
     selected_label = st.selectbox("**Choose the Correct Species:**", options=our_species, index=0)
     uploaded_file = st.file_uploader("**Upload your own audio file:**", type=["wav"])
     if uploaded_file is not None:
@@ -260,11 +252,12 @@ if st.button("Compute Predictions"):
 
     # Folder name looks like "00992_Animalia_Chordata_Amphibia_Anura_Hylidae_Pseudacris_crucifer" 
     if input_mode == "From Dataset": 
-        index = classes.index(selected_class) 
+        index = int(selected_class[0:5])  # get the index from the folder name
         with open(LABEL_DIR, "r") as f: 
             id_to_species = json.load(f) 
             correct_label = id_to_species[index] 
-    else: correct_label = selected_label
+    else: 
+        correct_label = selected_label
     st.success(f"**Correct Species:** {correct_label}") 
     st.markdown("<br>", unsafe_allow_html=True) 
 

@@ -30,6 +30,19 @@ DATA_DIR = "train_2/"
 VALID_PATH = "data/label_metadata/train_tiny_id_to_valid.json" 
 LABEL_DIR = "data/label_metadata/id_to_species.json"
 
+GDRIVE_URL = "https://drive.google.com/uc?export=download&id=1cik1DYKdagjUv0Jl42UrED3BMv13PFgz"
+
+# Download model if not present
+if not os.path.exists(MODEL_PATH):
+    print("Downloading model from Google Drive...")
+    try:
+        r = requests.get(GDRIVE_URL, allow_redirects=True)
+        r.raise_for_status()
+        open(MODEL_PATH, 'wb').write(r.content)
+        print("Model downloaded successfully.")
+    except Exception as e:
+        print("Failed to download model:", e)
+
 # Load model once at the top of your app
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 num_classes = 212039  # original model

@@ -22,32 +22,43 @@ from collections import Counter
 import json
 import gdown
 import os
+import requests
+from tqdm import tqdm
 
 MODEL_PATH = "cnn_model.pth"
-# need compatable with github repo structure
 DATA_DIR = "train_2/"
-
-VALID_PATH = "data/label_metadata/train_tiny_id_to_valid.json" 
+VALID_PATH = "data/label_metadata/train_tiny_id_to_valid.json"
 LABEL_DIR = "data/label_metadata/id_to_species.json"
+GDRIVE_FILE_ID = "1cik1DYKdagjUv0Jl42UrED3BMv13PFgz"
 
-GDRIVE_URL = "https://drive.google.com/uc?export=download&id=1cik1DYKdagjUv0Jl42UrED3BMv13PFgz"
+MODEL_PATH = "cnn_model.pth"
+HUGGINGFACE_URL = "https://huggingface.co/raitovn/nature-noises-cnn/blob/main/cnn_model.pth"
 
-# Download model if not present
+MODEL_PATH = "cnn_model.pth"
+HF_URL = "https://huggingface.co/raitovn/nature-noises-cnn/resolve/main/cnn_model.pth"
+
+# save model from huggingface to MODEL_PATH
 if not os.path.exists(MODEL_PATH):
-    print("Downloading model from Google Drive...")
-    try:
-        r = requests.get(GDRIVE_URL, allow_redirects=True)
-        r.raise_for_status()
-        open(MODEL_PATH, 'wb').write(r.content)
-        print("Model downloaded successfully.")
-    except Exception as e:
-        print("Failed to download model:", e)
+    st.info("Downloading model weights...")
+    response = requests.get(HF_URL, stream=True)
+    total_size_in_bytes= int(response.headers.get('content-length', 0))
+    block_size = 1024 #1 Kibibyte
+    progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+    with open(MODEL_PATH, 'wb') as f:
+        for data in response.iter_content(block_size):
+            progress_bar.update(len(data))
+            f.write(data)
+    progress_bar.close()
+    if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
+        st.error("ERROR, something went wrong during the download")
+    else:
+        st.success("Model downloaded successfully!")
 
-# Load model once at the top of your app
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-num_classes = 212039  # original model
+num_classes = 212039
 model = CNNModel(output_size=num_classes)
-model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=False))
 model.to(device)
 model.eval()
 

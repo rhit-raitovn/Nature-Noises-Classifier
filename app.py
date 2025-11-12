@@ -20,10 +20,31 @@ import torch
 import torchaudio.transforms as T
 from collections import Counter
 import json
+import gdown
+import os
 
-DATA_DIR = "/work/cssema416/202610/19/train/"
+MODEL_PATH = "cnn_model.pth"
+DATA_ZIP = "train.zip"
+DATA_DIR = "train/"
+
+if not os.path.exists(DATA_DIR):
+    with st.spinner("📦 Downloading dataset from Google Drive..."):
+        gdown.download(
+            "https://drive.google.com/uc?id=1cN_AlzimWSaxsvRA8GFzWXk3vfZBJu83", 
+            DATA_ZIP,
+            quiet=False
+        )
+        with zipfile.ZipFile(DATA_ZIP, 'r') as zip_ref:
+            zip_ref.extractall(DATA_DIR)
+
+if not os.path.exists(MODEL_PATH):
+    with st.spinner("🤖 Downloading model from Google Drive..."):
+        gdown.download(
+            "https://drive.google.com/uc?id=1cik1DYKdagjUv0Jl42UrED3BMv13PFgz", 
+            MODEL_PATH,
+            quiet=False
+        )
 VALID_PATH = "data/label_metadata/train_tiny_id_to_valid.json" 
-MODEL_PATH = "cnn_model.pth" 
 LABEL_DIR = "data/label_metadata/id_to_species.json"
 
 # Load model once at the top of your app
@@ -105,9 +126,10 @@ st.markdown(
 with open(VALID_PATH, "r") as f:
     valid_info = json.load(f)  
 valid_info = [v.lower() == true if isinstance(v, str) else v for v in valid_info]
-classes = sorted([c for c in os.listdir(DATA_DIR) if os.path.isdir(os.path.join(DATA_DIR, c))])
-valid_classes = [classes[i] for i in range(len(classes)) if valid_info[i]]
+with open(LABEL_DIR, "r") as f:
+    id_to_species = json.load(f)
 
+valid_classes = list(range(len(id_to_species)))
 
 # Select Input Source
 st.write("#### Choose Input Source")

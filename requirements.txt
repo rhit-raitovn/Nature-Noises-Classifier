@@ -7,3 +7,5 @@ numpy
 soundfile
 h5py
 gdown
+requests
+tqdm

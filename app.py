@@ -24,7 +24,8 @@ import gdown
 import os
 
 MODEL_PATH = "cnn_model.pth"
-DATA_DIR = "C:/Users/raitovn/OneDrive - Rose-Hulman Institute of Technology/School/Nature-Noises-Classifier/train_2/"
+# need compatable with github repo structure
+DATA_DIR = "train_2/"
 
 VALID_PATH = "data/label_metadata/train_tiny_id_to_valid.json" 
 LABEL_DIR = "data/label_metadata/id_to_species.json"

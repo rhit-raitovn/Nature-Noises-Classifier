@@ -26,13 +26,10 @@ import requests
 from tqdm import tqdm
 
 MODEL_PATH = "cnn_model.pth"
-DATA_DIR = "train_2/"
 VALID_PATH = "data/label_metadata/train_tiny_id_to_valid.json"
 LABEL_DIR = "data/label_metadata/id_to_species.json"
 GDRIVE_FILE_ID = "1cik1DYKdagjUv0Jl42UrED3BMv13PFgz"
-
-MODEL_PATH = "cnn_model.pth"
-HUGGINGFACE_URL = "https://huggingface.co/raitovn/nature-noises-cnn/blob/main/cnn_model.pth"
+DATA_DIR = "train_2/"
 
 MODEL_PATH = "cnn_model.pth"
 HF_URL = "https://huggingface.co/raitovn/nature-noises-cnn/resolve/main/cnn_model.pth"
@@ -128,6 +125,25 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+our_classes = ['00992_Animalia_Chordata_Amphibia_Anura_Hylidae_Pseudacris_crucifer',
+ '02430_Animalia_Chordata_Aves_Passeriformes_Cardinalidae_Cardinalis_cardinalis',
+ '02551_Animalia_Chordata_Aves_Passeriformes_Corvidae_Cyanocitta_cristata',
+ '02729_Animalia_Chordata_Aves_Passeriformes_Fringillidae_Fringilla_coelebs',
+ '02985_Animalia_Chordata_Aves_Passeriformes_Icteridae_Agelaius_phoeniceus',
+ '03301_Animalia_Chordata_Aves_Passeriformes_Muscicapidae_Erithacus_rubecula',
+ '03441_Animalia_Chordata_Aves_Passeriformes_Paridae_Parus_major',
+ '03448_Animalia_Chordata_Aves_Passeriformes_Paridae_Poecile_atricapillus',
+ '03584_Animalia_Chordata_Aves_Passeriformes_Passerellidae_Melospiza_melodia',
+ '03621_Animalia_Chordata_Aves_Passeriformes_Passeridae_Passer_domesticus',
+ '03672_Animalia_Chordata_Aves_Passeriformes_Phylloscopidae_Phylloscopus_collybita',
+ '03954_Animalia_Chordata_Aves_Passeriformes_Sylviidae_Sylvia_atricapilla',
+ '04360_Animalia_Chordata_Aves_Passeriformes_Troglodytidae_Thryothorus_ludovicianus',
+ '04361_Animalia_Chordata_Aves_Passeriformes_Troglodytidae_Troglodytes_aedon',
+ '04418_Animalia_Chordata_Aves_Passeriformes_Turdidae_Turdus_merula',
+ '04419_Animalia_Chordata_Aves_Passeriformes_Turdidae_Turdus_migratorius',
+ '04426_Animalia_Chordata_Aves_Passeriformes_Turdidae_Turdus_philomelos',
+ '04691_Animalia_Chordata_Aves_Passeriformes_Vireonidae_Vireo_olivaceus']
+
 our_species = ['Pseudacris crucifer',
  'Cardinalis cardinalis',
  'Cyanocitta cristata',
@@ -151,8 +167,8 @@ our_species = ['Pseudacris crucifer',
 with open(VALID_PATH, "r") as f:
     valid_info = json.load(f)  
 valid_info = [v.lower() == true if isinstance(v, str) else v for v in valid_info]
-valid_classes = sorted([c for c in os.listdir(DATA_DIR) if os.path.isdir(os.path.join(DATA_DIR, c))])
-classes = valid_classes
+valid_classes = our_classes
+classes = our_classes
 
 # Select Input Source
 st.write("#### Choose Input Source")
